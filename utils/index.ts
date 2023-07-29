@@ -1,4 +1,4 @@
-import { CarProps } from '@/types';
+import { CarProps, FilterProps, HomeProps } from '@/types';
 
 export const calculateCarRent = (city_mpg: number, year: number) => {
   const basePricePerDay = 50; // Base rental price per day in dollars
@@ -15,13 +15,16 @@ export const calculateCarRent = (city_mpg: number, year: number) => {
   return rentalRatePerDay.toFixed(0);
 };
 
-export async function fetchCars() {
+export async function fetchCars(
+  filter: FilterProps 
+) {
+  const { manufacturer, year, model, limit, fuel } = filter;
   const headers = {
-    'X-RapidAPI-Key': 'e1d620c1d5msh7a72335f1fd1da1p15fd91jsn604413917638',
-    'X-RapidAPI-Host': 'cars-by-api-ninjas.p.rapidapi.com',
+    'X-RapidAPI-Key': process.env.RAPID_API_KEY || '',
+    'X-RapidAPI-Host': process.env.RAPID_API_HOST || '',
   };
   const response = await fetch(
-    'https://cars-by-api-ninjas.p.rapidapi.com/v1/cars?model=corolla',
+    `https://cars-by-api-ninjas.p.rapidapi.com/v1/cars?make=${manufacturer}&year=${year}&model=${model}&limit=${limit}&fuel_type=${fuel}`,
     { headers }
   );
 
@@ -36,7 +39,22 @@ export const generateCarImageUrl = (car: CarProps, angle?: string) => {
   const carModel = model.toLowerCase();
   const carYear = year.toString().slice(-2);
 
-  const imageUrl = `https://www.cstatic-images.com/car-pictures/xl/${carMake}-${carModel}-${carYear}.jpg`;
+  const imageUrl = "/hero.png";
+  // `https://www.cstatic-images.com/car-pictures/xl/${carMake}-${carModel}-${carYear}.jpg`;
 
   return imageUrl;
 };
+
+export const updateSearchParams = (type: string, value: string) => {
+  // Get the current URL search params
+  const searchParams = new URLSearchParams(window.location.search);
+
+  // Set the specified search parameter to the given value
+  searchParams.set(type, value);
+
+  // Set the specified search parameter to the given value
+  const newPathname = `${window.location.pathname}?${searchParams.toString()}`;
+
+  return newPathname;
+};
+
