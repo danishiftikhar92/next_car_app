@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { SearchManufacturer } from './';
 import { useRouter } from 'next/navigation';
+import { SearchBarProps } from '@/types';
 
 const SearchButton = ({ otherClasses }: { otherClasses: string }) => (
   <button
@@ -20,39 +21,19 @@ const SearchButton = ({ otherClasses }: { otherClasses: string }) => (
   </button>
 );
 
-function SearchBar() {
-  const [manufacturer, setManufacturer] = useState('');
-  const [model, setModel] = useState('');
+function SearchBar({ setManuFacturer, setModel }: SearchBarProps) {
+  const [searchManufacturer, setSerchManufacturer] = useState('');
+  const [searchModel, setSearchModel] = useState('');
   const router = useRouter();
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (manufacturer === '' && model === '') {
+    if (searchManufacturer === '' && searchModel === '') {
       return;
     }
-    
-    updateSearchParam(model.toLocaleLowerCase(), manufacturer.toLocaleLowerCase());
-  };
-
-  const updateSearchParam = (model: string, manufacturer: string) => {
-    const searchParams = new URLSearchParams(window.location.search);
-
-    if (model !== '') {
-      searchParams.set('model', model);
-    } else {
-      searchParams.delete('model');
-    }
-
-    if (manufacturer !== '') {
-      searchParams.set('manufacturer', manufacturer);
-    } else {
-      searchParams.delete('manufacturer');
-    }
-
-    const newPathname = `${window.location.pathname}?${searchParams.toString()}`;
-
-    router.push(newPathname);
+    setModel(searchModel);
+    setManuFacturer(searchManufacturer);
   };
 
   return (
@@ -62,8 +43,8 @@ function SearchBar() {
     >
       <div className='searhbar__item'>
         <SearchManufacturer
-          manufacturer={manufacturer}
-          setManuFacturer={setManufacturer}
+          selected={searchManufacturer}
+          setSelected={setSerchManufacturer}
         />
         <SearchButton otherClasses='sm:hidden' />
       </div>
@@ -78,8 +59,8 @@ function SearchBar() {
         <input
           type='text'
           name='model'
-          value={model}
-          onChange={(e) => setModel(e.target.value)}
+          value={searchModel}
+          onChange={(e) => setSearchModel(e.target.value)}
           placeholder='Model'
           className='searchbar__input'
         />
